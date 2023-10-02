@@ -3,7 +3,27 @@
     ./hardware-configuration.nix
   ];
 
-  boot.loader.grub.device = "nodev";
+  /*
+  # bios
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/sda";
+  };
+  */
+
+  /*
+  # uefi
+  boot.loader = {
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot/efi";
+    };
+    grub = {
+      efiSupport = true;
+      device = "nodev";
+    };
+  };
+  */
 
   users.users = {
     kmies = {
