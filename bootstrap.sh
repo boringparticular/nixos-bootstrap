@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+DISK=/dev/"$1"
+USE_GPT="$2"
+
+if [[ -z "$USE_GPT+x" ]];
+then
+    sudo parted -- "$DISK" mklabel gpt
+    sudo parted -- "$DISK" mkpart ESP fat32 1MiB 512MiB
+    sudo parted -- "$DISK" set 1 esp on
+    # sudo parted -- "$DISK" set 1 boot on
+else
+    sudo parted -- "$DISK" mklabel msdos
+    sudo parted -- "$DISK" mkpart primary 1MiB 512MiB
+fi
+
 sudo parted -- "$DISK" mkpart primary 512MiB 100%
 
 sudo mkfs.fat -F 32 -n boot /dev/"$DISK"1
@@ -21,6 +35,12 @@ sudo mkdir /mnt/boot
 sudo mount /dev/"$DISK"1 /mnt/boot
 
 sudo nixos-generate-config --root /mnt
-sudo cp ./minimal.nix /etc/nixos/configuration.nix
-sudo nixos-install --root /mnt --no-root-passwd
-sudo reboot
+
+# if [[ -z "$USE_GPT+x" ]];
+# then
+#     sudo cp ./minimal.nix /etc/nixos/configuration.nix
+# else
+# fi
+#
+# sudo nixos-install --root /mnt --no-root-passwd
+# sudo reboot
